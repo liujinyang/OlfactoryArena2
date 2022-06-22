@@ -475,7 +475,7 @@ function select_exp_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of select_exp
 % oldPath = pwd;
 % cd(handles.expProtocolDir);
-[filename, pathname] = uigetfile([handles.expProtocolDir,'\*.xlsx;'], 'Select an experiment file');
+[filename, pathname] = uigetfile([handles.expProtocolDir,'\*.csv;'], 'Select an experiment file');
 if isequal(filename,0)
     return
 else
@@ -489,7 +489,7 @@ rng('shuffle');
 
 [indata,intext,~] = xlsread(expFile);
 
-handles.ProtocolHeader = intext(1:2,:);
+handles.ProtocolHeader = intext(1,:);
 handles.ProtocolData = indata;
 
 %trial control
@@ -788,10 +788,10 @@ if button_state == get(hObject,'Max')
 %         protocol = handles.protocol;
 %         protocolFile = [handles.expDataSubdir{i}, '\protocol.mat'];
 %         save(protocolFile,'protocol');
-        protocolExl = [handles.expDataSubdir{i}, '\protocol.xlsx'];
+        protocolExl = [handles.expDataSubdir{i}, '\protocol.csv'];
         ExlCell = cell(handles.protocol.totalStepNum + 2, size(handles.ProtocolData,2));
-        ExlCell(1:2,:) = handles.ProtocolHeader;
-        ExlCell(3:end,:) = num2cell(handles.ProtocolData);
+        ExlCell(1,:) = handles.ProtocolHeader;
+        ExlCell(2:end,:) = num2cell(handles.ProtocolData);
         xlswrite(protocolExl, ExlCell);
         %copyfile(handles.expFile, protocolExl);
 %         protocolCSV = [handles.expDataSubdir{i}, '\protocol.csv'];

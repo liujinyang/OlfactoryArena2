@@ -24,7 +24,7 @@ classdef LEDController < handle
                 Ir_int_val = round(power);
                 %send command to controller
                 fprintf(obj.serialPort, ['IR ',num2str(Ir_int_val)]);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
@@ -112,21 +112,21 @@ classdef LEDController < handle
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, ['PULSE ', num2str(param.pulse_width),' ',num2str(param.pulse_period),' ',num2str(param.number_of_pulses), ' ', ...
                     num2str(param.pulse_train_interval),' ',num2str(param.LED_delay),' ',num2str(param.iteration),' ',param.color]);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
         function startPulse(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'RUN');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
         function stopPulse(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'STOP');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
@@ -136,14 +136,14 @@ classdef LEDController < handle
                 % The first 0 means all panels, the second 0 means all
                 % quadrants
                 fprintf(obj.serialPort, 'ON 0,0');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
         function turnOffLED(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'OFF');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
@@ -151,7 +151,7 @@ classdef LEDController < handle
         function blinkMarker(obj,blinkT)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, ['blink ',num2str(blinkT),' red']);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
@@ -163,17 +163,17 @@ classdef LEDController < handle
         function setShockPattern(obj,param)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, ['DIGITAL ', param]);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
         function setShockPulse(obj,param)
             if  ~(obj.serialPort == 0)
-                ['PULSE ', num2str(param.onTime),' ',num2str(param.onTime + param.offTime),' ',num2str(param.cycles), ' 0 ', ...
-                    num2str(param.delayTime),' 1 D']
+                %['PULSE ', num2str(param.onTime),' ',num2str(param.onTime + param.offTime),' ',num2str(param.cycles), ' 0 ', ...
+                %    num2str(param.delayTime),' 1 D']
                 fprintf(obj.serialPort, ['PULSE ', num2str(param.onTime),' ',num2str(param.onTime + param.offTime),' ',num2str(param.cycles), ' 0 ', ...
                     num2str(param.delayTime),' 1 D']);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
@@ -182,14 +182,14 @@ classdef LEDController < handle
                 % The first 0 means all panels, the second 0 means all
                 % quadrants
                 fprintf(obj.serialPort, 'DON');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
         function turnOffShock(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'DOFF');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
@@ -198,20 +198,42 @@ classdef LEDController < handle
         function startShockPulse(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'RUN D');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
         function stopShockPulse(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'STOP');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
         %% functions to set up experiment protocols
         function totalSteps = addOneStep(obj,oneStep)
             if  ~(obj.serialPort == 0)   
+
+                %check length of pulse set < duration for red led
+                if (oneStep.RedIntensity > 0) && (oneStep.Duration < (oneStep.DelayTime + (oneStep.RedPulsePeriod * oneStep.RedPulseNum + oneStep.RedOffTime) * oneStep.RedIteration/1000))
+                    errorMsg = sprintf("Length of red led pulse set is longer than duration in step %d!", oneStep.NumStep);
+                    f = errordlg(errorMsg,'RED LED protocol Error');
+                    return;
+                end
+
+                %check length of pulse set < duration for green led
+                if (oneStep.GrnIntensity > 0) && (oneStep.Duration < (oneStep.DelayTime + (oneStep.GrnPulsePeriod * oneStep.GrnPulseNum + oneStep.GrnOffTime) * oneStep.GrnIteration/1000))
+                    errorMsg = sprintf("Length of green led pulse set is longer than duration in step %d!", oneStep.NumStep);
+                    f = errordlg(errorMsg,'Green LED protocol Error');
+                    return;
+                end
+
+                %check length of pulse set < duration for blue led
+                if (oneStep.BluIntensity > 0) && (oneStep.Duration < (oneStep.DelayTime + (oneStep.BluPulsePeriod * oneStep.BluPulseNum + oneStep.BluOffTime) * oneStep.BluIteration/1000))
+                    errorMsg = sprintf("Length of blue led pulse set is longer than duration in step %d!", oneStep.NumStep);
+                    f = errordlg(errorMsg,'Blue LED protocol Error');
+                    return;
+                end
+
                 
                 s = 'addOneStep ';                
                 x = [oneStep.NumStep, oneStep.RedIntensity, oneStep.RedPulseWidth,...
@@ -233,7 +255,7 @@ classdef LEDController < handle
                 else
                     fprintf(obj.serialPort, s);
                 end
-                                              
+                
                 if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
                 totalSteps = str2double(status);
             end
@@ -242,7 +264,7 @@ classdef LEDController < handle
         function removeAllExperimentSteps(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'removeAllSteps');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end             
         end        
                         
@@ -263,7 +285,7 @@ classdef LEDController < handle
         function stopExperiment(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'stopExperiment');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
@@ -293,7 +315,7 @@ classdef LEDController < handle
         function removeAllExperimentStepOrders(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'STEPORDER 0');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end             
         end   
         
@@ -301,14 +323,14 @@ classdef LEDController < handle
         function synCamera(obj, freq)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, ['SYNC ', freq]);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
         function flyBowlsEnabled(obj, enableMap)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, ['enableMap ', enableMap]);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end               
         end
         
@@ -321,7 +343,7 @@ classdef LEDController < handle
                 fprintf(obj.serialPort, ['ON 2 ', pattern(5:8)]);
                 fprintf(obj.serialPort, ['ON 3 ', pattern(9:12)]);
                 fprintf(obj.serialPort, ['ON 4 ', pattern(13:16)]);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end
         end
         
@@ -329,7 +351,7 @@ classdef LEDController < handle
         function reset(obj)
             if  ~(obj.serialPort == 0)
                 fprintf(obj.serialPort, 'RESET');
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+                %if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
             end               
         end        
              
