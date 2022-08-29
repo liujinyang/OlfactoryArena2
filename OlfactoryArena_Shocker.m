@@ -542,11 +542,11 @@ end
 %MFC control
 for i=1:handles.protocol.totalStepNum
     if handles.protocol.vial11(i)+handles.protocol.vial12(i)+handles.protocol.vial13(i)+handles.protocol.vial14(i)> 1
+        handles.protocol.MFC1SV(i) = 40;
+        handles.protocol.MFC3SV(i) = 40;
+    else
         handles.protocol.MFC1SV(i) = 20;
         handles.protocol.MFC3SV(i) = 20;
-    else
-        handles.protocol.MFC1SV(i) = 10;
-        handles.protocol.MFC3SV(i) = 10;
     end
     handles.protocol.MFC2SV(i) = 200;
     handles.protocol.MFC4SV(i) = 200;
@@ -789,7 +789,9 @@ if button_state == get(hObject,'Max')
 %         protocolFile = [handles.expDataSubdir{i}, '\protocol.mat'];
 %         save(protocolFile,'protocol');
         protocolExl = [handles.expDataSubdir{i}, '\protocol.csv'];
-        ExlCell = cell(handles.protocol.totalStepNum + 2, size(handles.ProtocolData,2));
+        ExlCell = cell(handles.protocol.totalStepNum + 1, size(handles.ProtocolData,2));
+        handles.ProtocolHeader{12} = 'Red LED in quadrant 1&3 (NW&SE)';
+        handles.ProtocolHeader{13} = 'Red LED in quadrant 2&4 (NE&SW)';
         ExlCell(1,:) = handles.ProtocolHeader;
         ExlCell(2:end,:) = num2cell(handles.ProtocolData);
         xlswrite(protocolExl, ExlCell);
