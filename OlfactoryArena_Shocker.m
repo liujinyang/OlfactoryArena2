@@ -544,12 +544,15 @@ for i=1:handles.protocol.totalStepNum
     if handles.protocol.vial11(i)+handles.protocol.vial12(i)+handles.protocol.vial13(i)+handles.protocol.vial14(i)> 1
         handles.protocol.MFC1SV(i) = 40;
         handles.protocol.MFC3SV(i) = 40;
+        handles.protocol.MFC2SV(i) = 180;
+        handles.protocol.MFC4SV(i) = 180;
     else
         handles.protocol.MFC1SV(i) = 20;
         handles.protocol.MFC3SV(i) = 20;
+        handles.protocol.MFC2SV(i) = 200;
+        handles.protocol.MFC4SV(i) = 200;
     end
-    handles.protocol.MFC2SV(i) = 200;
-    handles.protocol.MFC4SV(i) = 200;
+
 end
 
 handles.ProtocolData = [handles.ProtocolData, handles.Red13, handles.Red24];
